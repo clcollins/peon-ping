@@ -1,0 +1,2 @@
+FROM registry.fedoraproject.org/fedora:43
+RUN dnf install --assumeyes golang make findutils && dnf clean all

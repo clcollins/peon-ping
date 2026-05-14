@@ -1,27 +1,26 @@
-.vercel
-.env
-node_modules/
-video/out/
-video/public/sounds/
-video/src/*Preview.tsx
-!video/src/KirovPreview.tsx
-firebase-debug.log
-.claude/
-.env*.local
-social-post.md
-social-posts/
-.last_update_check
-.state.json
-homebrew-tap/
-PLAN-*.md
-checksums.txt
-video/promoted-packs.json
-scripts/peon-play
-.DS_Store
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-# Nix
-result
-result-*
-.direnv
-.envrc.local
-.gitban/
+# Test artifacts
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace
+go.work
+go.work.sum
+
+# Environment
+.env
+
+# State files (runtime, not committed)
+.state.json
+.paused
+.sound.pid
