@@ -36,7 +36,7 @@ func TestDefaultCategories(t *testing.T) {
 	cfg := Default()
 
 	expectations := map[string]bool{
-		"session.start":   true,
+		"session.start":    true,
 		"task.acknowledge": false,
 		"task.complete":    true,
 		"task.error":       true,

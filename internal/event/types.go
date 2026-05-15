@@ -5,14 +5,14 @@ import "time"
 type Category string
 
 const (
-	SessionStart   Category = "session.start"
+	SessionStart    Category = "session.start"
 	TaskAcknowledge Category = "task.acknowledge"
-	TaskComplete   Category = "task.complete"
-	TaskError      Category = "task.error"
-	InputRequired  Category = "input.required"
-	ResourceLimit  Category = "resource.limit"
-	UserSpam       Category = "user.spam"
-	None           Category = ""
+	TaskComplete    Category = "task.complete"
+	TaskError       Category = "task.error"
+	InputRequired   Category = "input.required"
+	ResourceLimit   Category = "resource.limit"
+	UserSpam        Category = "user.spam"
+	None            Category = ""
 )
 
 type HookEvent struct {
