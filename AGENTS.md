@@ -12,7 +12,7 @@ and its test suite.
 
 - cmd/peon/ (entry point)
 - internal/ (all packages: config, state, event, sound, player, notifier, cli)
-- packs/ (vendored sound files -- assets, not generated)
+- packs/ at ~/.claude/hooks/peon-ping/packs/ (downloaded from upstream, not in repo)
 - skills/ (Claude Code skill definitions)
 - docs/ (plan documents)
 
@@ -28,7 +28,7 @@ and its test suite.
 - Do not execute the peon binary's play functions outside of tests
 - Do not modify ~/.claude/settings.json hooks directly (document for user)
 - Do not add audio players beyond pw-play
-- Sound files in packs/ are vendored assets; do not regenerate
+- Sound packs are downloaded from upstream PeonPing/og-packs (CC-BY-NC-4.0), not committed to this repo
 - Never push to upstream PeonPing/peon-ping
 
 ## Conventions

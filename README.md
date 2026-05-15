@@ -14,9 +14,10 @@ Stripped-down, Fedora-Toolbox-specific, Go rewrite.
 
 Plays sound effects and sends desktop notifications when Claude Code reaches
 certain states: task complete, needs input, errors, session start, compacting,
-and more. Sounds are sourced from vendored packs (Warcraft Peon, StarCraft
-Kerrigan, GLaDOS, etc.) and played via PipeWire (`pw-play`) through the host
-audio socket bind-mounted into the Fedora Toolbox container.
+and more. Sound packs are downloaded separately from the upstream
+[PeonPing/og-packs](https://github.com/PeonPing/og-packs) repository and
+played via PipeWire (`pw-play`) through the host audio socket bind-mounted
+into the Fedora Toolbox container.
 
 ## Requirements
 
@@ -46,12 +47,28 @@ make install
 
 This builds `bin/peon` and copies it to `~/.local/bin/peon`.
 
-Set up the peon-ping data directory and copy sound packs and config:
+Set up the peon-ping data directory and copy config:
 
 ```bash
 mkdir -p ~/.claude/hooks/peon-ping
 cp config.json ~/.claude/hooks/peon-ping/config.json
-cp -r packs/ ~/.claude/hooks/peon-ping/packs/
+```
+
+Download sound packs from the upstream
+[PeonPing/og-packs](https://github.com/PeonPing/og-packs) repository
+(licensed CC-BY-NC-4.0 by their respective authors):
+
+```bash
+git clone --depth=1 --branch=v1.1.0 \
+  https://github.com/PeonPing/og-packs.git /tmp/og-packs
+
+for pack in peon peasant sc_kerrigan sc_battlecruiser glados; do
+  cp -r "/tmp/og-packs/$pack" ~/.claude/hooks/peon-ping/packs/"$pack"
+  mv ~/.claude/hooks/peon-ping/packs/"$pack"/openpeon.json \
+     ~/.claude/hooks/peon-ping/packs/"$pack"/manifest.json
+done
+
+rm -rf /tmp/og-packs
 ```
 
 Register Claude Code hooks in `~/.claude/settings.json`. Add the following
@@ -200,7 +217,9 @@ peon help            # Show usage
 
 ## Sound Packs
 
-Default vendored packs:
+Sound packs are downloaded from
+[PeonPing/og-packs](https://github.com/PeonPing/og-packs) (CC-BY-NC-4.0).
+They are not included in this repository. Default packs:
 
 | Pack | Description |
 |------|-------------|
