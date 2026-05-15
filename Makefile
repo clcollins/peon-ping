@@ -74,10 +74,70 @@ docs-check: ## Verify docs/ contains plan documents
 
 # ── Install ───────────────────────────────────────────────────────────────────
 
+PEON_DIR     ?= $(HOME)/.claude/hooks/peon-ping
+PACKS_DIR    ?= $(PEON_DIR)/packs
+PACKS_REPO   ?= https://github.com/PeonPing/og-packs.git
+PACKS_REF    ?= v1.1.0
+
 .PHONY: install
 install: build ## Build and install peon binary to ~/.local/bin
 	mkdir -p $(HOME)/.local/bin
 	cp bin/peon $(HOME)/.local/bin/peon
+
+SOUNDPACK ?=
+
+.PHONY: install-pack
+install-pack: ## Install a sound pack from upstream (SOUNDPACK=peon)
+	@if [ -z "$(SOUNDPACK)" ]; then \
+		echo "Usage: make install-pack SOUNDPACK=<name>"; \
+		echo ""; \
+		echo "Available packs (from $(PACKS_REPO) @ $(PACKS_REF)):"; \
+		git ls-remote --refs --tags $(PACKS_REPO) 2>/dev/null | head -1 >/dev/null; \
+		git clone --depth=1 --branch=$(PACKS_REF) $(PACKS_REPO) /tmp/og-packs-list 2>/dev/null; \
+		ls -1 /tmp/og-packs-list/ | grep -v -E '^\.' | grep -v LICENSE | grep -v README; \
+		rm -rf /tmp/og-packs-list; \
+		exit 1; \
+	fi
+	@echo "Installing pack: $(SOUNDPACK)"
+	git clone --depth=1 --branch=$(PACKS_REF) $(PACKS_REPO) /tmp/og-packs-dl 2>/dev/null
+	@if [ ! -d "/tmp/og-packs-dl/$(SOUNDPACK)" ]; then \
+		echo "Error: pack '$(SOUNDPACK)' not found in $(PACKS_REPO) @ $(PACKS_REF)"; \
+		rm -rf /tmp/og-packs-dl; \
+		exit 1; \
+	fi
+	mkdir -p $(PACKS_DIR)/$(SOUNDPACK)
+	cp -r /tmp/og-packs-dl/$(SOUNDPACK)/* $(PACKS_DIR)/$(SOUNDPACK)/
+	@if [ -f "$(PACKS_DIR)/$(SOUNDPACK)/openpeon.json" ]; then \
+		mv $(PACKS_DIR)/$(SOUNDPACK)/openpeon.json $(PACKS_DIR)/$(SOUNDPACK)/manifest.json; \
+	fi
+	rm -rf /tmp/og-packs-dl
+	@echo "Installed $(SOUNDPACK) to $(PACKS_DIR)/$(SOUNDPACK)"
+
+.PHONY: install-default-packs
+install-default-packs: ## Install all default sound packs (peon, peasant, sc_kerrigan, sc_battlecruiser, glados)
+	git clone --depth=1 --branch=$(PACKS_REF) $(PACKS_REPO) /tmp/og-packs-dl 2>/dev/null
+	@for pack in peon peasant sc_kerrigan sc_battlecruiser glados; do \
+		echo "Installing pack: $$pack"; \
+		mkdir -p $(PACKS_DIR)/$$pack; \
+		cp -r /tmp/og-packs-dl/$$pack/* $(PACKS_DIR)/$$pack/; \
+		if [ -f "$(PACKS_DIR)/$$pack/openpeon.json" ]; then \
+			mv $(PACKS_DIR)/$$pack/openpeon.json $(PACKS_DIR)/$$pack/manifest.json; \
+		fi; \
+	done
+	rm -rf /tmp/og-packs-dl
+	@echo "Installed 5 default packs to $(PACKS_DIR)"
+
+.PHONY: list-packs
+list-packs: ## List installed sound packs
+	@if [ -d "$(PACKS_DIR)" ]; then \
+		for pack in $(PACKS_DIR)/*/; do \
+			if [ -f "$$pack/manifest.json" ]; then \
+				basename "$$pack"; \
+			fi; \
+		done; \
+	else \
+		echo "No packs installed ($(PACKS_DIR) not found)"; \
+	fi
 
 # ── Local CI ──────────────────────────────────────────────────────────────────
 
