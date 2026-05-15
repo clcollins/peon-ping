@@ -104,7 +104,8 @@ tidy: ## Run go mod tidy
 .PHONY: tidy-check
 tidy-check: ## Verify go.mod and go.sum are tidy
 	$(GO) mod tidy
-	git diff --exit-code go.mod go.sum
+	git diff --exit-code go.mod
+	@if [ -f go.sum ]; then git diff --exit-code go.sum; fi
 
 $(GOLANGCI_LINT):
 	$(GO) install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3
