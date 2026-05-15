@@ -12,7 +12,7 @@ import (
 )
 
 func LoadManifest(path string) (*Manifest, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // path is from trusted config
 	if err != nil {
 		return nil, fmt.Errorf("sound: read manifest: %w", err)
 	}
@@ -25,7 +25,7 @@ func LoadManifest(path string) (*Manifest, error) {
 	return m, nil
 }
 
-func PickSound(m *Manifest, category string, lastPlayed string, rng *rand.Rand) (string, error) {
+func PickSound(m *Manifest, category, lastPlayed string, rng *rand.Rand) (string, error) {
 	cat, ok := m.Categories[category]
 	if !ok {
 		return "", fmt.Errorf("sound: category %q not found in manifest", category)
@@ -54,7 +54,7 @@ func PickSound(m *Manifest, category string, lastPlayed string, rng *rand.Rand) 
 	return choice.File, nil
 }
 
-func ResolvePack(cfg *config.Config, s *state.State, sessionID string, packsDir string) string {
+func ResolvePack(cfg *config.Config, s *state.State, sessionID, packsDir string) string {
 	if override, ok := s.SessionPacks[sessionID]; ok {
 		manifest := filepath.Join(packsDir, override, "manifest.json")
 		if _, err := os.Stat(manifest); err == nil {

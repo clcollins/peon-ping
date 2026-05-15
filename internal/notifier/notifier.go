@@ -22,7 +22,7 @@ func (n *DesktopNotifier) buildArgs(title, message, urgency string) []string {
 
 func (n *DesktopNotifier) Send(title, message, urgency string) error {
 	args := n.buildArgs(title, message, urgency)
-	cmd := exec.Command("notify-send", args...)
+	cmd := exec.Command("notify-send", args...) //nolint:gosec // args are constructed internally
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("notifier: notify-send: %w", err)
 	}

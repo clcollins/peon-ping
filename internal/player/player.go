@@ -24,21 +24,21 @@ func (p *PipeWirePlayer) buildArgs(soundFile string, volume float64) []string {
 }
 
 func (p *PipeWirePlayer) Play(soundFile string, volume float64) error {
-	p.KillPrevious()
+	_ = p.KillPrevious()
 
 	args := p.buildArgs(soundFile, volume)
-	p.cmd = exec.Command("pw-play", args...)
+	p.cmd = exec.Command("pw-play", args...) //nolint:gosec // args are constructed internally
 	if err := p.cmd.Start(); err != nil {
 		return fmt.Errorf("player: pw-play: %w", err)
 	}
 
-	go p.cmd.Wait()
+	go func() { _ = p.cmd.Wait() }()
 	return nil
 }
 
 func (p *PipeWirePlayer) KillPrevious() error {
 	if p.cmd != nil && p.cmd.Process != nil {
-		p.cmd.Process.Kill()
+		_ = p.cmd.Process.Kill()
 		p.cmd = nil
 	}
 	return nil

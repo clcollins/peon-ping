@@ -24,10 +24,24 @@ func TestToggleCreatesPaused(t *testing.T) {
 	}
 }
 
+func writeFile(t *testing.T, path string, data []byte) {
+	t.Helper()
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func mkdirAll(t *testing.T, path string) {
+	t.Helper()
+	if err := os.MkdirAll(path, 0o750); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestToggleRemovesPaused(t *testing.T) {
 	dir := t.TempDir()
 	pausedPath := filepath.Join(dir, ".paused")
-	os.WriteFile(pausedPath, []byte(""), 0644)
+	writeFile(t, pausedPath, []byte(""))
 
 	msg, err := Toggle(dir)
 	if err != nil {
@@ -46,11 +60,11 @@ func TestStatusShowsInfo(t *testing.T) {
 	dir := t.TempDir()
 
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
 
 	packDir := filepath.Join(dir, "packs", "peon")
-	os.MkdirAll(packDir, 0755)
-	os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+	mkdirAll(t, packDir)
+	writeFile(t, filepath.Join(packDir, "manifest.json"), []byte("{}"))
 
 	output := Status(cfgPath, dir)
 
@@ -66,8 +80,8 @@ func TestStatusShowsPaused(t *testing.T) {
 	dir := t.TempDir()
 
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
-	os.WriteFile(filepath.Join(dir, ".paused"), []byte(""), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
+	writeFile(t, filepath.Join(dir, ".paused"), []byte(""))
 
 	output := Status(cfgPath, dir)
 	if !strings.Contains(strings.ToLower(output), "paused") {
@@ -79,13 +93,13 @@ func TestUseValidPack(t *testing.T) {
 	dir := t.TempDir()
 
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
 
 	packsDir := filepath.Join(dir, "packs")
 	for _, name := range []string{"peon", "glados"} {
 		packDir := filepath.Join(packsDir, name)
-		os.MkdirAll(packDir, 0755)
-		os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+		mkdirAll(t, packDir)
+		writeFile(t, filepath.Join(packDir, "manifest.json"), []byte("{}"))
 	}
 
 	err := Use("glados", cfgPath, packsDir)
@@ -98,11 +112,11 @@ func TestUseInvalidPack(t *testing.T) {
 	dir := t.TempDir()
 
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
 
 	packsDir := filepath.Join(dir, "packs")
-	os.MkdirAll(filepath.Join(packsDir, "peon"), 0755)
-	os.WriteFile(filepath.Join(packsDir, "peon", "manifest.json"), []byte("{}"), 0644)
+	mkdirAll(t, filepath.Join(packsDir, "peon"))
+	writeFile(t, filepath.Join(packsDir, "peon", "manifest.json"), []byte("{}"))
 
 	err := Use("nonexistent", cfgPath, packsDir)
 	if err == nil {
@@ -115,9 +129,9 @@ func TestListPacks(t *testing.T) {
 
 	for _, name := range []string{"peon", "glados", "nopack"} {
 		packDir := filepath.Join(dir, name)
-		os.MkdirAll(packDir, 0755)
+		mkdirAll(t, packDir)
 		if name != "nopack" {
-			os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+			writeFile(t, filepath.Join(packDir, "manifest.json"), []byte("{}"))
 		}
 	}
 
@@ -134,7 +148,7 @@ func TestListPacks(t *testing.T) {
 func TestVolumeValid(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
 
 	err := Volume(0.8, cfgPath)
 	if err != nil {
@@ -145,7 +159,7 @@ func TestVolumeValid(t *testing.T) {
 func TestVolumeOutOfRange(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`), 0644)
+	writeFile(t, cfgPath, []byte(`{"enabled":true,"default_pack":"peon","volume":0.5}`))
 
 	if err := Volume(1.5, cfgPath); err == nil {
 		t.Error("Volume(1.5) should error")

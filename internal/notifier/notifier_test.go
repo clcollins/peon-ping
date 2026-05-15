@@ -26,8 +26,8 @@ func TestMockNotifierRecordsCalls(t *testing.T) {
 func TestMockNotifierMultipleCalls(t *testing.T) {
 	m := &MockNotifier{}
 
-	m.Send("A", "B", "low")
-	m.Send("C", "D", "critical")
+	_ = m.Send("A", "B", "low")
+	_ = m.Send("C", "D", "critical")
 
 	if len(m.SendCalls) != 2 {
 		t.Fatalf("expected 2 send calls, got %d", len(m.SendCalls))
