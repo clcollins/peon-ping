@@ -40,7 +40,7 @@ func Default() *Config {
 }
 
 func Load(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // path is from trusted config
 	if err != nil {
 		return Default(), nil
 	}
@@ -74,12 +74,12 @@ func (c *Config) Save(path string) error {
 	data = append(data, '\n')
 
 	tmp := filepath.Join(filepath.Dir(path), ".config.json.tmp")
-	if err := os.WriteFile(tmp, data, 0644); err != nil {
+	if err := os.WriteFile(tmp, data, 0o600); err != nil {
 		return fmt.Errorf("config: write tmp: %w", err)
 	}
 
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp)
 		return fmt.Errorf("config: rename: %w", err)
 	}
 

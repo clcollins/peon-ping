@@ -16,7 +16,7 @@ func TestLoadValidState(t *testing.T) {
 		"prompt_times": {"sess-1": [1000, 2000, 3000]},
 		"session_starts": {"sess-1": 1000}
 	}`)
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -54,7 +54,7 @@ func TestLoadCorruptJSON(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".state.json")
 
-	if err := os.WriteFile(path, []byte("{{invalid"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("{{invalid"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -72,7 +72,7 @@ func TestLoadEmptyObject(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".state.json")
 
-	if err := os.WriteFile(path, []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("{}"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 

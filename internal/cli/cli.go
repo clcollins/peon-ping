@@ -20,17 +20,17 @@ func Toggle(peonDir string) (string, error) {
 		return "Sounds resumed", nil
 	}
 
-	if err := os.WriteFile(pausedPath, []byte(""), 0644); err != nil {
+	if err := os.WriteFile(pausedPath, []byte(""), 0o600); err != nil {
 		return "", fmt.Errorf("cli: create paused: %w", err)
 	}
 	return "Sounds paused", nil
 }
 
-func Status(cfgPath string, peonDir string) string {
+func Status(cfgPath, peonDir string) string {
 	cfg, _ := config.Load(cfgPath)
 
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("Enabled: %v\n", cfg.Enabled))
+	fmt.Fprintf(&b, "Enabled: %v\n", cfg.Enabled)
 
 	pausedPath := filepath.Join(peonDir, ".paused")
 	if _, err := os.Stat(pausedPath); err == nil {
@@ -39,12 +39,12 @@ func Status(cfgPath string, peonDir string) string {
 		b.WriteString("Status: active\n")
 	}
 
-	b.WriteString(fmt.Sprintf("Pack: %s\n", cfg.DefaultPack))
-	b.WriteString(fmt.Sprintf("Volume: %.1f\n", cfg.Volume))
+	fmt.Fprintf(&b, "Pack: %s\n", cfg.DefaultPack)
+	fmt.Fprintf(&b, "Volume: %.1f\n", cfg.Volume)
 
 	packsDir := filepath.Join(peonDir, "packs")
 	packs, _ := List(packsDir)
-	b.WriteString(fmt.Sprintf("Installed packs: %s\n", strings.Join(packs, ", ")))
+	fmt.Fprintf(&b, "Installed packs: %s\n", strings.Join(packs, ", "))
 
 	b.WriteString("Categories:\n")
 	cats := make([]string, 0, len(cfg.Categories))
@@ -57,13 +57,13 @@ func Status(cfgPath string, peonDir string) string {
 		if !cfg.Categories[cat] {
 			status = "off"
 		}
-		b.WriteString(fmt.Sprintf("  %s: %s\n", cat, status))
+		fmt.Fprintf(&b, "  %s: %s\n", cat, status)
 	}
 
 	return b.String()
 }
 
-func Use(packName string, cfgPath string, packsDir string) error {
+func Use(packName, cfgPath, packsDir string) error {
 	manifest := filepath.Join(packsDir, packName, "manifest.json")
 	if _, err := os.Stat(manifest); err != nil {
 		packs, _ := List(packsDir)

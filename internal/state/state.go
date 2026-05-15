@@ -44,7 +44,7 @@ func (s *State) init() {
 }
 
 func Load(path string) (*State, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // path is from trusted config
 	if err != nil {
 		return New(), nil
 	}
@@ -66,12 +66,12 @@ func (s *State) Save(path string) error {
 	data = append(data, '\n')
 
 	tmp := filepath.Join(filepath.Dir(path), ".state.json.tmp")
-	if err := os.WriteFile(tmp, data, 0644); err != nil {
+	if err := os.WriteFile(tmp, data, 0o600); err != nil {
 		return fmt.Errorf("state: write tmp: %w", err)
 	}
 
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp)
 		return fmt.Errorf("state: rename: %w", err)
 	}
 

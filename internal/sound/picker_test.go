@@ -32,7 +32,7 @@ func testManifest() *Manifest {
 
 func TestPickSoundFromCategory(t *testing.T) {
 	m := testManifest()
-	rng := rand.New(rand.NewSource(42))
+	rng := rand.New(rand.NewSource(42)) //nolint:gosec // deterministic seed for test
 
 	file, err := PickSound(m, "session.start", "", rng)
 	if err != nil {
@@ -48,7 +48,7 @@ func TestPickSoundAvoidsLastPlayed(t *testing.T) {
 
 	seen := make(map[string]bool)
 	for i := 0; i < 100; i++ {
-		rng := rand.New(rand.NewSource(int64(i)))
+		rng := rand.New(rand.NewSource(int64(i))) //nolint:gosec // deterministic seed for test
 		file, err := PickSound(m, "session.start", "sounds/Hello1.wav", rng)
 		if err != nil {
 			t.Fatalf("PickSound() error: %v", err)
@@ -63,7 +63,7 @@ func TestPickSoundAvoidsLastPlayed(t *testing.T) {
 
 func TestPickSoundSingleReturnsOnly(t *testing.T) {
 	m := testManifest()
-	rng := rand.New(rand.NewSource(42))
+	rng := rand.New(rand.NewSource(42)) //nolint:gosec // deterministic seed for test
 
 	file, err := PickSound(m, "task.complete", "sounds/Done1.wav", rng)
 	if err != nil {
@@ -76,7 +76,7 @@ func TestPickSoundSingleReturnsOnly(t *testing.T) {
 
 func TestPickSoundMissingCategory(t *testing.T) {
 	m := testManifest()
-	rng := rand.New(rand.NewSource(42))
+	rng := rand.New(rand.NewSource(42)) //nolint:gosec // deterministic seed for test
 
 	_, err := PickSound(m, "nonexistent.category", "", rng)
 	if err == nil {
@@ -91,7 +91,7 @@ func TestPickSoundEmptyCategory(t *testing.T) {
 			"session.start": {Sounds: []ManifestSound{}},
 		},
 	}
-	rng := rand.New(rand.NewSource(42))
+	rng := rand.New(rand.NewSource(42)) //nolint:gosec // deterministic seed for test
 
 	_, err := PickSound(m, "session.start", "", rng)
 	if err == nil {
@@ -99,11 +99,20 @@ func TestPickSoundEmptyCategory(t *testing.T) {
 	}
 }
 
+func setupPackDir(t *testing.T, dir, name string) {
+	t.Helper()
+	packDir := filepath.Join(dir, name)
+	if err := os.MkdirAll(packDir, 0o750); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResolvePackDefault(t *testing.T) {
 	dir := t.TempDir()
-	packDir := filepath.Join(dir, "peon")
-	os.MkdirAll(packDir, 0755)
-	os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+	setupPackDir(t, dir, "peon")
 
 	cfg := config.Default()
 	s := state.New()
@@ -117,9 +126,7 @@ func TestResolvePackDefault(t *testing.T) {
 func TestResolvePackSessionOverride(t *testing.T) {
 	dir := t.TempDir()
 	for _, name := range []string{"peon", "glados"} {
-		packDir := filepath.Join(dir, name)
-		os.MkdirAll(packDir, 0755)
-		os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+		setupPackDir(t, dir, name)
 	}
 
 	cfg := config.Default()
@@ -134,9 +141,7 @@ func TestResolvePackSessionOverride(t *testing.T) {
 
 func TestResolvePackSessionOverrideMissing(t *testing.T) {
 	dir := t.TempDir()
-	packDir := filepath.Join(dir, "peon")
-	os.MkdirAll(packDir, 0755)
-	os.WriteFile(filepath.Join(packDir, "manifest.json"), []byte("{}"), 0644)
+	setupPackDir(t, dir, "peon")
 
 	cfg := config.Default()
 	s := state.New()

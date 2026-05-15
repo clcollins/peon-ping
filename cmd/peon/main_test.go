@@ -11,11 +11,18 @@ import (
 	"github.com/clcollins/peon-ping/internal/player"
 )
 
+func writeTestFile(t *testing.T, path string, data []byte) {
+	t.Helper()
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func setupTestDir(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
 
-	os.WriteFile(filepath.Join(dir, "config.json"), []byte(`{
+	writeTestFile(t, filepath.Join(dir, "config.json"), []byte(`{
 		"enabled": true,
 		"default_pack": "peon",
 		"volume": 0.5,
@@ -32,13 +39,15 @@ func setupTestDir(t *testing.T) string {
 		"annoyed_threshold": 3,
 		"annoyed_window_seconds": 10,
 		"session_start_cooldown_seconds": 30
-	}`), 0644)
+	}`))
 
-	os.WriteFile(filepath.Join(dir, ".state.json"), []byte("{}"), 0644)
+	writeTestFile(t, filepath.Join(dir, ".state.json"), []byte("{}"))
 
 	packDir := filepath.Join(dir, "packs", "peon", "sounds")
-	os.MkdirAll(packDir, 0755)
-	os.WriteFile(filepath.Join(dir, "packs", "peon", "manifest.json"), []byte(`{
+	if err := os.MkdirAll(packDir, 0o750); err != nil {
+		t.Fatal(err)
+	}
+	writeTestFile(t, filepath.Join(dir, "packs", "peon", "manifest.json"), []byte(`{
 		"name": "peon",
 		"categories": {
 			"session.start": {"sounds": [{"file": "sounds/Hello1.wav"}]},
@@ -48,10 +57,10 @@ func setupTestDir(t *testing.T) string {
 			"resource.limit": {"sounds": [{"file": "sounds/Limit1.wav"}]},
 			"user.spam": {"sounds": [{"file": "sounds/Spam1.wav"}]}
 		}
-	}`), 0644)
+	}`))
 
 	for _, f := range []string{"Hello1.wav", "Done1.wav", "Error1.wav", "Input1.wav", "Limit1.wav", "Spam1.wav"} {
-		os.WriteFile(filepath.Join(packDir, f), []byte("fake wav"), 0644)
+		writeTestFile(t, filepath.Join(packDir, f), []byte("fake wav"))
 	}
 
 	return dir
@@ -131,7 +140,7 @@ func TestProcessHookPermissionRequest(t *testing.T) {
 
 func TestProcessHookPaused(t *testing.T) {
 	dir := setupTestDir(t)
-	os.WriteFile(filepath.Join(dir, ".paused"), []byte(""), 0644)
+	writeTestFile(t, filepath.Join(dir, ".paused"), []byte(""))
 
 	mp := &player.MockPlayer{}
 	mn := &notifier.MockNotifier{}
@@ -227,9 +236,12 @@ func TestProcessHookUpdatesState(t *testing.T) {
 		SessionID: "test-session",
 	}
 
-	processHook(ev, dir, mp, mn, &clock)
+	if err := processHook(ev, dir, mp, mn, &clock); err != nil {
+		t.Fatalf("processHook() error: %v", err)
+	}
 
-	data, err := os.ReadFile(filepath.Join(dir, ".state.json"))
+	statePath := filepath.Join(dir, ".state.json")
+	data, err := os.ReadFile(statePath) //nolint:gosec // test file path
 	if err != nil {
 		t.Fatalf("failed to read state: %v", err)
 	}

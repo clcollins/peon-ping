@@ -23,8 +23,8 @@ func TestMockPlayerRecordsCalls(t *testing.T) {
 func TestMockPlayerMultipleCalls(t *testing.T) {
 	m := &MockPlayer{}
 
-	m.Play("/a.wav", 0.3)
-	m.Play("/b.wav", 0.7)
+	_ = m.Play("/a.wav", 0.3)
+	_ = m.Play("/b.wav", 0.7)
 
 	if len(m.PlayCalls) != 2 {
 		t.Fatalf("expected 2 play calls, got %d", len(m.PlayCalls))

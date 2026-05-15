@@ -27,7 +27,7 @@ func TestLoadManifestValid(t *testing.T) {
 			}
 		}
 	}`)
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -58,7 +58,7 @@ func TestLoadManifestCorrupt(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "manifest.json")
 
-	if err := os.WriteFile(path, []byte("{bad json"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("{bad json"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 

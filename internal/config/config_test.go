@@ -71,7 +71,7 @@ func TestLoadValidConfig(t *testing.T) {
 		"annoyed_window_seconds": 20,
 		"session_start_cooldown_seconds": 60
 	}`)
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -115,7 +115,7 @@ func TestLoadCorruptJSON(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.json")
 
-	if err := os.WriteFile(path, []byte("{not valid json"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("{not valid json"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 

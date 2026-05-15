@@ -1,5 +1,7 @@
 # peon-ping (personal fork)
 
+![Peon-Ping](img/peon-ping.png)
+
 Warcraft III Peon voice notifications for Claude Code hooks.
 Stripped-down, Linux-only Go rewrite with full Fedora Toolbox support.
 

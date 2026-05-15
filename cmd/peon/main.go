@@ -69,7 +69,7 @@ func processHook(ev *event.HookEvent, dir string, p player.Player, n notifier.No
 
 	if ev.EventName == "SessionStart" {
 		if event.CheckCooldown(s, ev.SessionID, "SessionStart", cfg.SessionStartCooldownSeconds, clock) {
-			s.Save(statePath)
+			_ = s.Save(statePath)
 			return nil
 		}
 	}
@@ -84,24 +84,26 @@ func processHook(ev *event.HookEvent, dir string, p player.Player, n notifier.No
 	}
 
 	lastPlayed := s.LastPlayed[packName]
-	rng := rand.New(rand.NewSource(clock.Now().UnixNano()))
+	rng := rand.New(rand.NewSource(clock.Now().UnixNano())) //nolint:gosec // not security-sensitive
 
 	soundFile, err := sound.PickSound(manifest, string(category), lastPlayed, rng)
 	if err != nil {
-		s.Save(statePath)
+		_ = s.Save(statePath)
 		return nil
 	}
 
 	fullPath := filepath.Join(packsDir, packName, soundFile)
-	p.Play(fullPath, cfg.Volume)
+	if err := p.Play(fullPath, cfg.Volume); err != nil {
+		return fmt.Errorf("main: play: %w", err)
+	}
 
 	s.LastPlayed[packName] = soundFile
-	s.Save(statePath)
+	_ = s.Save(statePath)
 
 	if cfg.DesktopNotifications && (category == event.InputRequired || category == event.TaskError) {
 		title := "peon-ping"
 		message := fmt.Sprintf("[%s] %s", packName, string(category))
-		n.Send(title, message, "normal")
+		_ = n.Send(title, message, "normal")
 	}
 
 	return nil

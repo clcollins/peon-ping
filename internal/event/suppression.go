@@ -4,7 +4,7 @@ import (
 	"github.com/clcollins/peon-ping/internal/state"
 )
 
-func CheckSpam(s *state.State, sessionID string, threshold int, windowSecs int, clock Clock) bool {
+func CheckSpam(s *state.State, sessionID string, threshold, windowSecs int, clock Clock) bool {
 	now := clock.Now().Unix()
 
 	cutoff := now - int64(windowSecs)
@@ -24,7 +24,7 @@ func CheckSpam(s *state.State, sessionID string, threshold int, windowSecs int, 
 	return isSpam
 }
 
-func CheckCooldown(s *state.State, sessionID string, eventName string, cooldownSecs int, clock Clock) bool {
+func CheckCooldown(s *state.State, sessionID, eventName string, cooldownSecs int, clock Clock) bool {
 	now := clock.Now().Unix()
 
 	if events, ok := s.LastEvent[sessionID]; ok {
