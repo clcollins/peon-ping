@@ -63,22 +63,22 @@ mkdir -p ~/.claude/hooks/peon-ping
 cp config.json ~/.claude/hooks/peon-ping/config.json
 ```
 
-Download sound packs from the upstream
+Install the default sound packs from the upstream
 [PeonPing/og-packs](https://github.com/PeonPing/og-packs) repository
 (licensed CC-BY-NC-4.0 by their respective authors):
 
 ```bash
-git clone --depth=1 --branch=v1.1.0 \
-  https://github.com/PeonPing/og-packs.git /tmp/og-packs
-
-for pack in peon peasant sc_kerrigan sc_battlecruiser glados; do
-  cp -r "/tmp/og-packs/$pack" ~/.claude/hooks/peon-ping/packs/"$pack"
-  mv ~/.claude/hooks/peon-ping/packs/"$pack"/openpeon.json \
-     ~/.claude/hooks/peon-ping/packs/"$pack"/manifest.json
-done
-
-rm -rf /tmp/og-packs
+make install-default-packs
 ```
+
+Or install a specific pack:
+
+```bash
+make install-pack SOUNDPACK=glados
+```
+
+Run `make install-pack` without a `SOUNDPACK` to see all available packs
+from upstream.
 
 Register Claude Code hooks in `~/.claude/settings.json`. Add the following
 entries to the `hooks` object. All events use async execution except
@@ -277,6 +277,9 @@ make vet             # Run go vet
 make build           # Build binary
 make ci              # Run all CI checks locally
 make ci-all          # Run CI inside container (podman)
+make install-pack    # Install a sound pack (SOUNDPACK=name)
+make install-default-packs  # Install all 5 default packs
+make list-packs      # List installed sound packs
 make help            # Show all targets
 ```
 
