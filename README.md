@@ -1,14 +1,15 @@
 # peon-ping (personal fork)
 
 Warcraft III Peon voice notifications for Claude Code hooks.
-Stripped-down, Fedora-Toolbox-specific, Go rewrite.
+Stripped-down, Linux-only Go rewrite with full Fedora Toolbox support.
 
 > **Attribution**: This is a personal fork of
 > [PeonPing/peon-ping](https://github.com/PeonPing/peon-ping) by Tony Sheng.
 > Original project licensed under MIT.
 > This fork removes all non-Linux platforms, non-Claude-Code IDE integrations,
 > and Python/bash dependencies in favor of a minimal Go binary targeting
-> Fedora Toolbox with PipeWire audio.
+> Linux with PipeWire audio. Fully tested and supported inside Fedora Toolbox
+> containers, but works on any Linux system with PipeWire.
 
 ## What it does
 
@@ -16,22 +17,28 @@ Plays sound effects and sends desktop notifications when Claude Code reaches
 certain states: task complete, needs input, errors, session start, compacting,
 and more. Sound packs are downloaded separately from the upstream
 [PeonPing/og-packs](https://github.com/PeonPing/og-packs) repository and
-played via PipeWire (`pw-play`) through the host audio socket bind-mounted
-into the Fedora Toolbox container.
+played via PipeWire (`pw-play`). When running inside a Fedora Toolbox
+container, audio routes through the host's PipeWire socket which is
+automatically bind-mounted into the toolbox.
 
 ## Requirements
 
-- Fedora Toolbox (or any Linux with bash 5+, PipeWire)
+- Linux with PipeWire (works directly on host or inside Fedora Toolbox)
 - `pw-play` (from `pipewire-utils`)
 - `notify-send` (from `libnotify`)
 - Go 1.23+ (for building from source)
 
-### Toolbox image requirement
+### Fedora Toolbox setup (optional)
 
-The `pipewire-utils` package must be installed in your toolbox image to provide
-`pw-play`. If using
+If running inside a Fedora Toolbox container, `pipewire-utils` must be
+installed in the toolbox image to provide `pw-play`. The host's PipeWire
+socket is automatically bind-mounted, so audio plays through the host's
+speakers with no extra configuration.
+
+If using
 [toolbox-devtools](https://github.com/clcollins/toolbox-devtools), this is
-included. For manual installation inside a running toolbox:
+included ([PR #7](https://github.com/clcollins/toolbox-devtools/pull/7)).
+For manual installation inside a running toolbox:
 
 ```bash
 sudo dnf install pipewire-utils
@@ -274,3 +281,7 @@ make help            # Show all targets
 ## License
 
 MIT (see [LICENSE](LICENSE))
+
+---
+
+*100% Vibe Coded* 🤖

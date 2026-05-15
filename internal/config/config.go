@@ -8,14 +8,14 @@ import (
 )
 
 type Config struct {
-	Enabled                    bool            `json:"enabled"`
-	DefaultPack                string          `json:"default_pack"`
-	Volume                     float64         `json:"volume"`
-	DesktopNotifications       bool            `json:"desktop_notifications"`
-	Categories                 map[string]bool `json:"categories"`
-	AnnoyedThreshold           int             `json:"annoyed_threshold"`
-	AnnoyedWindowSeconds       int             `json:"annoyed_window_seconds"`
-	SessionStartCooldownSeconds int            `json:"session_start_cooldown_seconds"`
+	Enabled                     bool            `json:"enabled"`
+	DefaultPack                 string          `json:"default_pack"`
+	Volume                      float64         `json:"volume"`
+	DesktopNotifications        bool            `json:"desktop_notifications"`
+	Categories                  map[string]bool `json:"categories"`
+	AnnoyedThreshold            int             `json:"annoyed_threshold"`
+	AnnoyedWindowSeconds        int             `json:"annoyed_window_seconds"`
+	SessionStartCooldownSeconds int             `json:"session_start_cooldown_seconds"`
 }
 
 func Default() *Config {
@@ -25,7 +25,7 @@ func Default() *Config {
 		Volume:               0.5,
 		DesktopNotifications: true,
 		Categories: map[string]bool{
-			"session.start":   true,
+			"session.start":    true,
 			"task.acknowledge": false,
 			"task.complete":    true,
 			"task.error":       true,
@@ -33,8 +33,8 @@ func Default() *Config {
 			"resource.limit":   true,
 			"user.spam":        true,
 		},
-		AnnoyedThreshold:           3,
-		AnnoyedWindowSeconds:       10,
+		AnnoyedThreshold:            3,
+		AnnoyedWindowSeconds:        10,
 		SessionStartCooldownSeconds: 30,
 	}
 }
